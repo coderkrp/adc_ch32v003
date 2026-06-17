@@ -1,0 +1,21 @@
+# PlatformIO build artifacts
+.pio
+.pioenvs
+.piolibdeps
+
+# IDE configurations
+.vscode/
+.idea/
+.clang_complete
+.gcc-flags.json
+.ccls-cache
+
+# Compilation databases
+compile_commands.json
+
+# Operating system files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.log
