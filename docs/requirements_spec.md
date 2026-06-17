@@ -7,7 +7,7 @@ This document defines the functional requirements, specifications, and register 
 
 ## 1. Product Overview
 
-The **CH32V003 I2C ADC Module** is a programmable co-processor designed to offload analog-to-digital conversions, filtering, voltage calibration, and limit monitoring from a Master MCU.
+The **CH32V003 I2C ADC Module** is an active, programmable co-processor designed to replace expensive, fixed-function dedicated ADC chips. By leveraging the ultra-low-cost CH32V003F4P6 RISC-V microcontroller, it offloads continuous multi-channel analog-to-digital conversions, digital filtering (DSP), supply voltage drift correction, and autonomous threshold window monitoring from a Master MCU.
 
 ```
 +------------------+                   +-------------------------+

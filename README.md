@@ -1,6 +1,6 @@
 # CH32V003 I2C ADC Module
 
-A programmable, high-performance co-processor firmware for the **CH32V003F4P6 (TSSOP20)** RISC-V microcontroller. It offloads continuous multi-channel analog-to-digital conversion, digital low-pass filtering, supply voltage drift correction, and threshold window limit checks from a Master MCU (such as an ESP32, STM32, Arduino, or Raspberry Pi) over the I2C bus.
+An active, programmable co-processor firmware designed to replace expensive, fixed-function dedicated ADC chips (like the ADS1115 or PCF8591). By leveraging the ultra-low-cost **CH32V003F4P6 (TSSOP20)** RISC-V microcontroller, it offloads continuous multi-channel analog scanning, digital filtering, supply voltage drift compensation, and autonomous window limit checks from a Master MCU (such as an ESP32, STM32, Arduino, or Raspberry Pi) over the I2C bus.
 
 ```
 +------------------+                   +-------------------------+
@@ -13,6 +13,16 @@ A programmable, high-performance co-processor firmware for the **CH32V003F4P6 (T
 |                  |                     v              v
 +------------------+                [Analog Ins]    [1.2V Bandgap]
 ```
+## Project Impetus: Why use a programmable co-processor instead of a dedicated ADC?
+
+While off-the-shelf I2C ADC chips (such as the ADS1115 or PCF8591) are widely available, using a programmable microcontroller like the CH32V003 as a dedicated ADC co-processor offers several critical engineering and cost advantages:
+
+1.  **Local DSP & Filtering (Zero Master CPU Load):** Dedicated ADCs output raw readings that the Master MCU must continuously fetch and process. Our module performs Exponential Moving Average (EMA) low-pass filtering locally, providing clean, noise-free readings without consuming Master CPU cycles or RAM.
+2.  **Autonomous Watchdog & Latching Alerts:** Most budget ADCs lack threshold interrupt outputs. Even when available, they rarely support latching (sticky) behaviors. Our module monitors configurable high/low limits for *all* channels in the background. If a threshold is violated, the ALERT pin immediately pulls low and latches, ensuring transient faults are never missed, even if the Master is sleeping.
+3.  **Automatic Supply Voltage Drift Correction:** Budget ADCs use the $V_{DD}$ rail as their measurement reference, meaning any fluctuations in $V_{DD}$ corrupt the readings. By continuously scanning its internal 1.2V bandgap reference, our co-processor dynamically calculates $V_{DD}$ drift and corrects all output readings, presenting the Master with pre-calibrated values in actual millivolts ($mV$).
+4.  **Extreme Cost Efficiency:** High-quality dedicated ADCs can cost between $1.50 and $3.00. The CH32V003 chip costs less than **$0.15** in volume, making this co-processor an incredibly cheap, multi-channel ADC solution.
+5.  **Flexible I2C Addressing:** Traditional ADC chips limit addressing options to 2 or 4 hardwired pins. Our module allows writing *any* 7-bit address to `DEVICE_ADDR` and saving it to flash, allowing up to 127 modules to coexist on the same bus.
+6.  **Extensibility & Adaptability:** Because it runs standard C firmware, you can easily modify this code to add local math (e.g., NTC thermistor linearization, calibration offsets, oversampling, or peak detection) right at the edge.
 
 ---
 
