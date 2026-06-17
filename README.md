@@ -1,6 +1,12 @@
 # CH32V003 I2C ADC Module
 
+[![PlatformIO Build](https://github.com/YOUR_GITHUB_USERNAME/adc_ch32v003/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/adc_ch32v003/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Framework: ch32v003fun](https://img.shields.io/badge/Framework-ch32v003fun-blueviolet.svg)](https://github.com/cnlohr/ch32v003fun)
+[![PlatformIO Compatible](https://img.shields.io/badge/PlatformIO-compatible-blue.svg)](https://platformio.org)
+
 An active, programmable co-processor firmware designed to replace expensive, fixed-function dedicated ADC chips (like the ADS1115 or PCF8591). By leveraging the ultra-low-cost **CH32V003F4P6 (TSSOP20)** RISC-V microcontroller, it offloads continuous multi-channel analog scanning, digital filtering, supply voltage drift compensation, and autonomous window limit checks from a Master MCU (such as an ESP32, STM32, Arduino, or Raspberry Pi) over the I2C bus.
+
 
 ```
 +------------------+                   +-------------------------+

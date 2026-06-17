@@ -73,9 +73,11 @@ adc_ch32v003/
 │   ├── build_flash_guide.md
 │   ├── hardware_design.md
 │   ├── i2c_integration_guide.md
-│   └── requirements_spec.md
+│   ├── requirements_spec.md
+│   └── window_limit_alerts.md
 ├── include/
-│   └── funconfig.h     # ch32fun configuration overrides
+│   ├── funconfig.h     # ch32fun configuration overrides
+│   └── i2c_slave.h     # Modified I2C slave library
 ├── src/
 │   └── main.c          # Core firmware source code
 └── platformio.ini      # PlatformIO configuration file
@@ -136,3 +138,25 @@ If you prefer building without PlatformIO using raw GCC and `make`, the project 
    ```bash
    make monitor
    ```
+
+---
+
+## 7. Troubleshooting
+
+### Windows Username with Spaces (cc1.exe compilation error)
+If your Windows username contains spaces (e.g., `C:\Users\John Doe`), PlatformIO may fail to compile with errors similar to:
+```text
+cc1.exe: fatal error: C:\Users\John: No such file or directory
+compilation terminated.
+cc1.exe: fatal error: Doe\.platformio\packages\framework-ch32v003fun\ch32fun\ch32fun.ld: No such file or directory
+```
+This occurs because the `ch32v003fun` framework's linker script builder does not handle spaces in paths correctly.
+
+**Workaround:**
+Modify `platformio.ini` to redirect the PlatformIO core directory to a path without spaces (such as a local directory inside the project folder):
+```ini
+[platformio]
+core_dir = .pio/core
+```
+This forces PlatformIO to download and run the compiler tools within the project folder itself, bypassing the global home directory path issue.
+
