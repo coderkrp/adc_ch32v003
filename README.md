@@ -175,7 +175,8 @@ adc_ch32v003/
 │   ├── requirements_spec.md  # Product specifications
 │   ├── architecture_design.md# Firmware architecture and loops
 │   ├── hardware_design.md    # Schematic recommendations and BOM
-│   └── i2c_integration_guide.md # Multi-platform Master driver examples
+│   ├── i2c_integration_guide.md # Multi-platform Master driver examples
+│   └── window_limit_alerts.md# Window limits & latching alerts guide
 ├── include/
 │   ├── funconfig.h           # ch32fun framework clock/debug configuration
 │   └── i2c_slave.h           # Modified single-file I2C slave library
@@ -188,12 +189,13 @@ adc_ch32v003/
 
 ---
 
-## Software Integration & Driver Code
+## Documentation & Integration Guide
 
-Refer to **[docs/i2c_integration_guide.md](docs/i2c_integration_guide.md)** for fully detailed, boilerplate-ready master drivers and examples for:
-*   **Arduino (C++ `<Wire.h>`)**
-*   **Generic Embedded C (HAL/ESP-IDF)**
-*   **Raspberry Pi / Linux Single-Board Computers (Python `smbus2`)**
+*   **[Window Limits & Latching Alerts Guide](docs/window_limit_alerts.md)**: Detailed explanation of window limit monitoring, latching alarms, PD2 hardware interrupts, and real-world system safety use cases.
+*   **[I2C Master Driver Guide](docs/i2c_integration_guide.md)**: Fully detailed, boilerplate-ready master drivers and examples for:
+    *   **Arduino (C++ `<Wire.h>`)**
+    *   **Generic Embedded C (HAL/ESP-IDF)**
+    *   **Raspberry Pi / Linux Single-Board Computers (Python `smbus2`)**
 
 ---
 
