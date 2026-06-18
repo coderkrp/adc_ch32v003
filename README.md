@@ -1,6 +1,10 @@
 # CH32V003 I2C ADC Module
 
 [![PlatformIO Build](https://github.com/YOUR_GITHUB_USERNAME/adc_ch32v003/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/adc_ch32v003/actions/workflows/build.yml)
+[![Version](https://img.shields.io/badge/Version-v1.0-orange.svg)](#)
+[![Resolution](https://img.shields.io/badge/Resolution-10--bit-green.svg)](#)
+[![MCU](https://img.shields.io/badge/MCU-CH32V003-blue.svg)](#)
+[![Interface](https://img.shields.io/badge/Interface-I2C%20Slave-lightgrey.svg)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Framework: ch32v003fun](https://img.shields.io/badge/Framework-ch32v003fun-blueviolet.svg)](https://github.com/cnlohr/ch32v003fun)
 [![PlatformIO Compatible](https://img.shields.io/badge/PlatformIO-compatible-blue.svg)](https://platformio.org)
