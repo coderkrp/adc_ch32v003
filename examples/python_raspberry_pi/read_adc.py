@@ -3,7 +3,7 @@
 CH32V003 I2C ADC Module - Raspberry Pi Python Example
 
 This script demonstrates how to interface a Raspberry Pi (or any Linux SBC)
-with the CH32V003 ADC Module using Python and the smbus2 library.
+with the CH32V003 ADC Module using Python and the reusable ch32v003_adc driver class.
 It reads the drift-corrected system VDD and calculates the physical external
 voltages on Channel 0 based on a scaling resistor divider network.
 
@@ -24,14 +24,7 @@ Linearity Warning:
 
 import time
 import sys
-from smbus2 import SMBus
-
-# Default 7-bit I2C Address of the CH32V003 ADC Module
-ADC_MODULE_ADDR = 0x24
-
-# Register Address Definitions
-REG_VDD_MV = 0x02
-REG_MV_CH0 = 0x06
+from ch32v003_adc import CH32V003_ADC
 
 # Resistor divider values from docs/adc_linearity_guide.md for 12V battery scaling
 # R1 = 39k, R2 = 10k => Ratio = R2 / (R1 + R2) = 10 / 49 = 0.2041
@@ -39,26 +32,17 @@ R1_OHMS = 39000.0
 R2_OHMS = 10000.0
 DIVIDER_RATIO = R2_OHMS / (R1_OHMS + R2_OHMS)
 
-def read_register16(bus, reg_address):
-    """Reads a 16-bit register from the module (Big-Endian format)"""
-    try:
-        # Read a block of 2 bytes starting at the register address
-        data = bus.read_i2c_block_data(ADC_MODULE_ADDR, reg_address, 2)
-        msb = data[0]
-        lsb = data[1]
-        return (msb << 8) | lsb
-    except IOError as e:
-        print(f"Error reading I2C register {hex(reg_address)}: {e}")
-        return None
-
 def main():
     print("=== CH32V003 ADC Module Raspberry Pi Python Example ===")
     
-    # Open I2C bus 1 (standard on Raspberry Pi)
+    # Initialize the driver on standard I2C bus 1
     try:
-        bus = SMBus(1)
+        adc = CH32V003_ADC(bus_id=1)
     except FileNotFoundError:
         print("Error: I2C bus 1 not found. Please enable I2C via raspi-config.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error initializing I2C connection: {e}")
         sys.exit(1)
 
     print("I2C Bus initialized. Reading data (Ctrl+C to exit)...")
@@ -67,10 +51,10 @@ def main():
     try:
         while True:
             # 1. Read Drift-Corrected VDD rail
-            vdd_mv = read_register16(bus, REG_VDD_MV)
+            vdd_mv = adc.read_vdd()
             
             # 2. Read Voltage on CH0 (Pin input voltage in mV)
-            ch0_mv = read_register16(bus, REG_MV_CH0)
+            ch0_mv = adc.read_channel_mv(0)
             
             if vdd_mv is not None and ch0_mv is not None:
                 # 3. Scale back to real battery voltage (using divider ratio)
@@ -84,7 +68,7 @@ def main():
     except KeyboardInterrupt:
         print("\nExiting program.")
     finally:
-        bus.close()
+        adc.close()
 
 if __name__ == "__main__":
     main()

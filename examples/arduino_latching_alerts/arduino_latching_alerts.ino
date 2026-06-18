@@ -23,20 +23,16 @@
       See docs/window_limit_alerts.md for more details.
 */
 
-#include <Wire.h>
-
-const uint8_t ADC_MODULE_I2C_ADDR = 0x24;
-
-// Register Address Definitions
-const uint8_t REG_LIMIT_HIGH_CH0 = 0x24;
-const uint8_t REG_LIMIT_LOW_CH0  = 0x26;
-const uint8_t REG_ALERT_STATUS   = 0x44;
+#include "CH32V003_ADC.h"
 
 // Arduino Pin mapping for D2 (external interrupt 0 on Uno/Nano)
 const uint8_t INTERRUPT_PIN = 2;
 
 // Volatile flag set by the ISR
 volatile bool alertTriggered = false;
+
+// Instantiate the driver class
+CH32V003_ADC adc;
 
 // ISR (Interrupt Service Routine)
 void handleAlertInterrupt() {
@@ -49,8 +45,13 @@ void setup() {
 
   Serial.println(F("=== CH32V003 ADC Module latching_alerts Example ==="));
 
-  // Initialize I2C Master
-  Wire.begin();
+  // Initialize the driver and communication
+  if (adc.begin()) {
+    Serial.println(F("Communication with CH32V003 ADC Module established successfully."));
+  } else {
+    Serial.println(F("Error: Could not communicate with CH32V003 ADC Module. Check wiring!"));
+  }
+  
   Wire.setClock(400000);
 
   // 1. Configure the ALERT pin on the Arduino (needs a pull-up because module is Open-Drain)
@@ -61,12 +62,12 @@ void setup() {
   // Safe window: High = 2500mV, Low = 1000mV
   // If CH0 voltage exceeds 2.5V or falls below 1.0V, the alert will trigger
   Serial.println(F("Setting CH0 limits: Low = 1000 mV, High = 2500 mV..."));
-  writeRegister16(REG_LIMIT_HIGH_CH0, 2500);
-  writeRegister16(REG_LIMIT_LOW_CH0, 1000);
+  adc.setChannelThresholds(0, 2500, 1000);
 
-  // 3. Clear any existing alerts
-  // Write 0xFF to clear all bits (write '1' to clear)
-  writeRegister8(REG_ALERT_STATUS, 0xFF);
+  // 3. Clear any existing alerts for channels 0 to 7
+  for (uint8_t ch = 0; ch < 8; ch++) {
+    adc.clearAlert(ch);
+  }
   alertTriggered = false;
 
   Serial.println(F("Setup complete. Monitoring..."));
@@ -79,7 +80,7 @@ void loop() {
     Serial.println(F("\n>>> ALERT PIN PULLED LOW! <<<"));
 
     // Read ALERT_STATUS register to see which channel violated limits
-    uint8_t status = readRegister8(REG_ALERT_STATUS);
+    uint8_t status = adc.readAlerts();
     Serial.print(F("ALERT_STATUS Bitmask: 0x"));
     Serial.println(status, HEX);
 
@@ -93,7 +94,7 @@ void loop() {
         // Clear the sticky alarm for this channel by writing a '1' back to its bit
         Serial.print(F("Clearing alarm for Channel "));
         Serial.println(ch);
-        writeRegister8(REG_ALERT_STATUS, (1 << ch));
+        adc.clearAlert(ch);
       }
     }
     
@@ -106,41 +107,4 @@ void loop() {
     lastHeartbeat = millis();
     Serial.println(F("Heartbeat: Monitoring background sequences..."));
   }
-}
-
-// Helper: Write a 16-bit register (Big-Endian format)
-void writeRegister16(uint8_t regAddress, uint16_t value) {
-  Wire.beginTransmission(ADC_MODULE_I2C_ADDR);
-  Wire.write(regAddress);
-  Wire.write((uint8_t)(value >> 8));   // MSB
-  Wire.write((uint8_t)(value & 0xFF)); // LSB
-  if (Wire.endTransmission() != 0) {
-    Serial.println(F("Error: I2C write16 failed."));
-  }
-}
-
-// Helper: Write a 8-bit register
-void writeRegister8(uint8_t regAddress, uint8_t value) {
-  Wire.beginTransmission(ADC_MODULE_I2C_ADDR);
-  Wire.write(regAddress);
-  Wire.write(value);
-  if (Wire.endTransmission() != 0) {
-    Serial.println(F("Error: I2C write8 failed."));
-  }
-}
-
-// Helper: Read a 8-bit register
-uint8_t readRegister8(uint8_t regAddress) {
-  Wire.beginTransmission(ADC_MODULE_I2C_ADDR);
-  Wire.write(regAddress);
-  if (Wire.endTransmission(false) != 0) {
-    Serial.println(F("Error: I2C read8 request failed."));
-    return 0;
-  }
-  
-  uint8_t bytesReceived = Wire.requestFrom(ADC_MODULE_I2C_ADDR, (uint8_t)1);
-  if (bytesReceived == 1) {
-    return Wire.read();
-  }
-  return 0;
 }
