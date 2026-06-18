@@ -3,8 +3,16 @@ name: PlatformIO Build
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - 'platformio.ini'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - 'platformio.ini'
 
 jobs:
   build:
