@@ -196,7 +196,8 @@ adc_ch32v003/
 │   ├── architecture_design.md# Firmware architecture and loops
 │   ├── hardware_design.md    # Schematic recommendations and BOM
 │   ├── i2c_integration_guide.md # Multi-platform Master driver examples
-│   └── window_limit_alerts.md# Window limits & latching alerts guide
+│   ├── window_limit_alerts.md# Window limits & latching alerts guide
+│   └── adc_linearity_guide.md# ADC linearity & voltage divider design guide
 ├── include/
 │   ├── funconfig.h           # ch32fun framework clock/debug configuration
 │   └── i2c_slave.h           # Modified single-file I2C slave library
@@ -211,6 +212,7 @@ adc_ch32v003/
 
 ## Documentation & Integration Guide
 
+*   **[ADC Linearity & Voltage Divider Design Guide](docs/adc_linearity_guide.md)**: Details on the physical limitations of the CH32V003 10-bit SAR ADC and how to design voltage divider circuits to maintain optimum accuracy.
 *   **[Window Limits & Latching Alerts Guide](docs/window_limit_alerts.md)**: Detailed explanation of window limit monitoring, latching alarms, PD2 hardware interrupts, and real-world system safety use cases.
 *   **[I2C Master Driver Guide](docs/i2c_integration_guide.md)**: Fully detailed, boilerplate-ready master drivers and examples for:
     *   **Arduino (C++ `<Wire.h>`)**
