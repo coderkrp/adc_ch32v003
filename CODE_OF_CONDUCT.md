@@ -59,8 +59,10 @@ appointed representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders at krp.sign.up@google.com. All
-complaints will be reviewed and investigated promptly and fairly.
+reported privately to the repository maintainers by opening a security
+advisory at https://github.com/coderkrp/adc_ch32v003/security/advisories
+or by contacting them directly through the repository's discussions or issues.
+All reports will be reviewed and investigated promptly and fairly.
 
 
 All community leaders have a duty to respect the privacy and security of the
