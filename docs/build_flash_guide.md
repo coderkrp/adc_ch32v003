@@ -69,6 +69,7 @@ Your PlatformIO project directory should be structured as follows:
 adc_ch32v003/
 ├── .pio/               # PlatformIO build artifacts (auto-generated)
 ├── docs/               # Reference design documentation
+│   ├── adc_linearity_guide.md
 │   ├── architecture_design.md
 │   ├── build_flash_guide.md
 │   ├── hardware_design.md

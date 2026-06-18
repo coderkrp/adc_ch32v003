@@ -82,6 +82,7 @@ Because $7.96\text{ k}\Omega < 10\text{ k}\Omega$, the source impedance is low e
 ## 4. Built-in Firmware Corrections
 
 The firmware on the co-processor automatically applies three corrections to maximize accuracy:
-1. **Dynamic VDD Tracking:** The firmware continuously reads the internal $1.2\text{V}$ reference channel (see [main.c:L113-L123](file:///home/kaspar/Code/adc_ch32v003/src/main.c#L113-L123)) to compute the actual value of $V_{DD}$. This corrects all calculations against power supply drift.
-2. **Startup Self-Calibration:** An ADC self-calibration cycle is executed on boot to eliminate internal comparator offsets (see [main.c:L268-L277](file:///home/kaspar/Code/adc_ch32v003/src/main.c#L268-L277)).
-3. **EMA Noise Filter:** The Exponential Moving Average digital filter smoothens thermal and high-frequency electrical noise (see [main.c:L125-L139](file:///home/kaspar/Code/adc_ch32v003/src/main.c#L125-L139)).
+1. **Dynamic VDD Tracking:** The firmware continuously reads the internal $1.2\text{V}$ reference channel (see [main.c:L113-L123](../src/main.c#L113-L123)) to compute the actual value of $V_{DD}$. This corrects all calculations against power supply drift.
+2. **Startup Self-Calibration:** An ADC self-calibration cycle is executed on boot to eliminate internal comparator offsets (see [main.c:L268-L277](../src/main.c#L268-L277)).
+3. **EMA Noise Filter:** The Exponential Moving Average digital filter smoothens thermal and high-frequency electrical noise (see [main.c:L125-L139](../src/main.c#L125-L139)).
+
