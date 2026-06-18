@@ -1,6 +1,6 @@
 # CH32V003 I2C ADC Module
 
-[![PlatformIO Build](https://github.com/coderkrp/adc_ch32v003/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/adc_ch32v003/actions/workflows/build.yml)
+[![PlatformIO Build](https://github.com/coderkrp/adc_ch32v003/actions/workflows/build.yml/badge.svg)](https://github.com/coderkrp/adc_ch32v003/actions/workflows/build.yml)
 [![Version](https://img.shields.io/badge/Version-v1.0-orange.svg)](#)
 [![Resolution](https://img.shields.io/badge/Resolution-10--bit-green.svg)](#)
 [![MCU](https://img.shields.io/badge/MCU-CH32V003-blue.svg)](#)
