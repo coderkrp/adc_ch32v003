@@ -85,8 +85,12 @@ int main(void) {
     SetupI2CSlave(slave_addr, i2c_registers, sizeof(i2c_registers), onWrite, NULL, false);
     
     // Timebase variables for non-blocking 1ms loop
+    // NOTE: SysTick->CNT runs at HCLK/8 unless FUNCONF_SYSTICK_USE_HCLK is set,
+    // HCLK is 24MHz unless FUNCONF_USE_PLL is set given internal oscillator is used.
+    // see https://github.com/cnlohr/ch32fun/wiki/Time
+    // for target update rate of 1000 Hz (every 1ms), it can be auto derived from Ticks_from_Ms(1) macro.
     uint32_t last_tick = SysTick->CNT;
-    uint32_t tick_interval = FUNCONF_SYSTEM_CORE_CLOCK / 1000; // 24000 cycles at 24MHz
+    uint32_t tick_interval = Ticks_from_Ms(1);
     
     printf("Initialization complete. Entering main loop...\n");
     
