@@ -58,17 +58,17 @@ Designed to operate on either a 3.3V or 5.0V power rail, matching the logic leve
 | **1** | PD4 | AI | **AIN7** | Analog input channel 7 |
 | **2** | PD5 | AI | **AIN5** | Analog input channel 5 |
 | **3** | PD6 | AI | **AIN6** | Analog input channel 6 |
-| **7** | PA1 | AI | **AIN1** | Analog input channel 1 |
-| **8** | PA2 | AI | **AIN0** | Analog input channel 0 |
+| **4** | PD7 | I/O | **NRST** | Optional Reset line (WCH-LinkE NRST) |
+| **5** | PA1 | AI | **AIN1** | Analog input channel 1 |
+| **6** | PA2 | AI | **AIN0** | Analog input channel 0 |
+| **7** | GND | Power | **GND** | System Ground |
 | **9** | VDD | Power | **VDD** | Input voltage (2.7V - 5.5V). Decouple with 100nF + 10uF capacitors. |
-| **10** | GND | Power | **GND** | System Ground |
 | **11** | PC1 | I/O | **SDA** | I2C Data Line (Requires external 4.7kΩ pull-up to VDD) |
 | **12** | PC2 | I/O | **SCL** | I2C Clock Line (Requires external 4.7kΩ pull-up to VDD) |
-| **13** | PC4 | AI | **AIN2** | Analog input channel 2 |
-| **15** | PD1 | I/O | **SWIO** | Programming Clock/Data line (WCH-LinkE) |
-| **16** | PD7 | I/O | **NRST** | Optional Reset line (WCH-LinkE NRST) |
-| **18** | PD2 | I/O | **ALERT / AIN3** | Active-Low Interrupt Pin (Wired-AND config) OR Analog Channel AIN3 |
-| **19** | PD3 | AI | **AIN4** | Analog input channel 4 |
+| **14** | PC4 | AI | **AIN2** | Analog input channel 2 |
+| **18** | PD1 | I/O | **SWIO** | Programming Clock/Data line (WCH-LinkE) |
+| **19** | PD2 | I/O | **ALERT / AIN3** | Active-Low Interrupt Pin (Wired-AND config) OR Analog Channel AIN3 |
+| **20** | PD3 | AI | **AIN4** | Analog input channel 4 |
 
 > [!IMPORTANT]
 > **PD2 Shared Functionality:** `PD2` acts as both the active-low hardware `ALERT` interrupt pin and the analog input channel `AIN3`. 
