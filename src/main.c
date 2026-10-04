@@ -259,11 +259,10 @@ void initialize_adc_dma(void) {
     RCC->APB2PRSTR &= ~RCC_APB2Periph_ADC1;
     
     // Configure sampling times:
-    // SAMPTR2: channels 0 to 7 to 241 cycles (value 7)
-    ADC1->SAMPTR2 = 0xFFFFFF;
-    // SAMPTR1: channel 8 (Vref) to 241 cycles (value 7)
-    ADC1->SAMPTR1 = 0x07;
-    
+    // Refer sections 9.3.4 and 9.3.5 of CH32V003RM.PDF
+    // SAMPTR2: channels 0 to 8 to 241 cycles (value 7)
+    ADC1->SAMPTR2 = 0x07FFFFFF; // sets bits [26:0] to 1
+
     // Turn on ADC
     ADC1->CTLR2 |= ADC_ADON;
     
