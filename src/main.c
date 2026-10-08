@@ -39,6 +39,16 @@ volatile bool reset_requested = false;
 
 volatile uint32_t *nvm_flash_ptr = (volatile uint32_t *)NVM_FLASH_ADDRESS;
 
+// Store a 16-bit register value Big-Endian.  The I2C interrupt handler hands
+// these two bytes to the master one at a time, so the pair is updated with that
+// interrupt masked, otherwise a reader could catch a half-written value.
+static inline void set_reg16(uint8_t reg, uint16_t value) {
+    NVIC_DisableIRQ(I2C1_EV_IRQn);
+    i2c_registers[reg]     = (value >> 8) & 0xFF;
+    i2c_registers[reg + 1] = value & 0xFF;
+    NVIC_EnableIRQ(I2C1_EV_IRQn);
+}
+
 // -----------------------------------------------------------------------------
 // Function Declarations
 // -----------------------------------------------------------------------------
@@ -119,8 +129,7 @@ int main(void) {
             }
             
             // Update VDD registers in Big-Endian format
-            i2c_registers[0x02] = (vdd_mv >> 8) & 0xFF;
-            i2c_registers[0x03] = vdd_mv & 0xFF;
+            set_reg16(0x02, (uint16_t)vdd_mv);
             
             // C. Apply Exponential Moving Average (EMA) filter
             uint8_t alpha = (i2c_registers[0x00] >> 4) & 0x0F;
@@ -133,9 +142,7 @@ int main(void) {
                 }
                 
                 // Write filtered raw value to RAW_CHx register (Big-Endian)
-                uint16_t raw_val = filtered_adc[i] & 0x03FF;
-                i2c_registers[0x04 + i * 4] = (raw_val >> 8) & 0xFF;
-                i2c_registers[0x05 + i * 4] = raw_val & 0xFF;
+                set_reg16(0x04 + i * 4, filtered_adc[i] & 0x03FF);
             }
             
             // D. Convert to millivolts and check alarm thresholds
@@ -143,8 +150,7 @@ int main(void) {
                 uint32_t mv = (filtered_adc[i] * vdd_mv) / 1023;
                 
                 // Update MV_CHx register (Big-Endian)
-                i2c_registers[0x06 + i * 4] = (mv >> 8) & 0xFF;
-                i2c_registers[0x07 + i * 4] = mv & 0xFF;
+                set_reg16(0x06 + i * 4, (uint16_t)mv);
                 
                 // Read limits (Big-Endian)
                 uint16_t high_limit = ((uint16_t)i2c_registers[0x24 + i * 4] << 8) | i2c_registers[0x25 + i * 4];

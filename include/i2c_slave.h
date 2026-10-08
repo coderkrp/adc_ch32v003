@@ -1,5 +1,31 @@
 /*
- * Single-File-Header I2C Slave Library for CH32V003
+ * Single-File-Header for using the I2C peripheral in slave mode
+ *
+ * MIT License
+ *
+ * Copyright (c) 2024 Renze Nicolai
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+/*
  * Adapted from the ch32v003fun community project.
  */
 
@@ -10,6 +36,36 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+
+/* ---------------------------------------------------------------------------
+16-bit read coherency
+
+A 16-bit register is clocked out to the master as two separate bytes, served
+by two separate TXE interrupts. If the application republished the value in
+between, the master would assemble (high byte of one sample, low byte of the
+next) - a reading that never existed.  Latching both bytes when the first one
+is served keeps the pair coherent. The capture is a single aligned halfword
+load on this architecture, so it cannot itself be caught half-written.
+The application masks this interrupt while it updates the array, for the same reason.
+
+The register array is big-endian (high byte first) while the CPU is
+little-endian, so the byte at regs[base] is the LOW half of the loaded word.
+  ---------------------------------------------------------------------------
+*/
+
+static uint16_t i2c_pair_latch;
+static uint8_t  i2c_pair_base = 0xFF;
+
+static inline uint8_t i2c_bank_read(volatile uint8_t *regs, uint8_t pos)
+{
+    uint8_t base = pos & (uint8_t)~1; // even address of the 16-bit pair
+    if (base != i2c_pair_base) {
+        i2c_pair_latch = *(volatile uint16_t *)&regs[base];
+        i2c_pair_base = base;
+    }
+    return (pos & 1) ? (uint8_t)(i2c_pair_latch >> 8)      // regs[base + 1]
+                     : (uint8_t)(i2c_pair_latch & 0xFF);   // regs[base]
+}
 
 typedef void (*i2c_write_callback_t)(uint8_t reg, uint8_t length);
 typedef void (*i2c_read_callback_t)(uint8_t reg);
@@ -114,6 +170,7 @@ void I2C1_EV_IRQHandler(void) {
     if (STAR1 & I2C_STAR1_ADDR) { // Start event
         i2c_slave_state.first_write = 1; // Next write will be the offset
         i2c_slave_state.position = i2c_slave_state.offset; // Reset position
+        i2c_pair_base = 0xFF; // New transaction: latch the pair again
         i2c_slave_state.address2matched = !!(STAR2 & I2C_STAR2_DUALF);
     }
 
@@ -143,7 +200,7 @@ void I2C1_EV_IRQHandler(void) {
         i2c_slave_state.writing = false;
         if (i2c_slave_state.address2matched) {
             if (i2c_slave_state.position < i2c_slave_state.size2) {
-                I2C1->DATAR = i2c_slave_state.registers2[i2c_slave_state.position];
+                I2C1->DATAR = i2c_bank_read(i2c_slave_state.registers2, i2c_slave_state.position);
                 if (i2c_slave_state.read_callback2 != NULL) {
                     i2c_slave_state.read_callback2(i2c_slave_state.position);
                 }
@@ -153,7 +210,7 @@ void I2C1_EV_IRQHandler(void) {
             }
         } else {
             if (i2c_slave_state.position < i2c_slave_state.size1) {
-                I2C1->DATAR = i2c_slave_state.registers1[i2c_slave_state.position];
+                I2C1->DATAR = i2c_bank_read(i2c_slave_state.registers1, i2c_slave_state.position);
                 if (i2c_slave_state.read_callback1 != NULL) {
                     i2c_slave_state.read_callback1(i2c_slave_state.position);
                 }
